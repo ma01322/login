@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Key Validator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            padding: 40px 30px;
+            text-align: center;
+            transform: scale(0.9);
+            animation: scaleIn 0.6s forwards;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 6s infinite;
+        }
+        
+        @keyframes shine {
+            0% {
+                left: -50%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+        
+        @keyframes scaleIn {
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .key-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            animation: float 3s ease-in-out infinite, glow 2s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.5));
+        }
+        
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.5));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(255, 204, 0, 0.8));
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        h1 {
+            color: white;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            outline: none;
+            color: white;
+            padding-left: 50px;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        input:focus {
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.2);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 20px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff9a00, #ffcc00);
+            color: #333;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            transition: 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            padding: 20px;
+            font-weight: 500;
+            transition: all 0.4s;
+            opacity: 0;
+            transform: translateY(10px);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .valid {
+            background: rgba(76, 175, 80, 0.15);
+            color: #a5d6a7;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            animation: successPulse 0.5s;
+        }
+        
+        .invalid {
+            background: rgba(244, 67, 54, 0.15);
+            color: #ffab91;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            animation: shake 0.5s;
+        }
+        
+        @keyframes successPulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% {transform: translateX(0);}
+            10%, 30%, 50%, 70%, 90% {transform: translateX(-5px);}
+            20%, 40%, 60%, 80% {transform: translateX(5px);}
+        }
+        
+        .hint {
+            margin-top: 20px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .security-indicator {
+            height: 5px;
+            border-radius: 3px;
+            margin-top: 10px;
+            background: #333;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .security-progress {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+        
+        .weak {
+            background: linear-gradient(to right, #ff5252, #ff7675);
+        }
+        
+        .medium {
+            background: linear-gradient(to right, #ffb142, #ffda79);
+        }
+        
+        .strong {
+            background: linear-gradient(to right, #2ed573, #7bed9f);
+        }
+        
+        .requirements {
+            text-align: left;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        
+        .requirements ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .requirements li {
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            position: relative;
+        }
+        
+        .requirements li::before {
+            content: '•';
+            color: #ffcc00;
+            font-weight: bold;
+            display: inline-block; 
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 204, 0, 0.3);
+            border-radius: 50%;
+            animation: floatParticle 15s infinite linear;
+        }
+        
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100vw) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            input {
+                padding: 15px 15px 15px 45px;
+            }
+            
+            button {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="key-icon"><i class="fas fa-key"></i></div>
+        <h1>Advanced Key Validator</h1>
+        <p>Enter any key to validate its format and strength</p>
+        
+        <div class="input-group">
+            <div class="input-icon"><i class="fas fa-lock"></i></div>
+            <input type="text" id="keyInput" placeholder="Enter your key here..." autocomplete="off">
+        </div>
+        
+        <div class="security-indicator">
+            <div class="security-progress" id="securityProgress"></div>
+        </div>
+        
+        <button id="validateBtn">
+            <i class="fas fa-check-circle"></i> Validate Key
+        </button>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="requirements">
+            <p>Key requirements:</p>
+            <ul>
+                <li>At least 8 characters long</li>
+                <li>Contains uppercase letters</li>
+                <li>Contains lowercase letters</li>
+                <li>Includes numbers</li>
+                <li>Includes special characters</li>
+            </ul>
+        </div>
+        
+        <p class="hint">Try any key - all will show as invalid (this is by design)</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const keyInput = document.getElementById('keyInput');
+            const validateBtn = document.getElementById('validateBtn');
+            const resultDiv = document.getElementById('result');
+            const securityProgress = document.getElementById('securityProgress');
+            const particlesContainer = document.getElementById('particles');
+            
+            // Create background particles
+            createParticles();
+            
+            // Focus on input field
+            keyInput.focus();
+            
+            // Input event listener for real-time validation
+            keyInput.addEventListener('input', function() {
+                updateSecurityIndicator();
+            });
+            
+            // Validate key function
+            function validateKey() {
+                const key = keyInput.value.trim();
+                
+                if (key === '') {
+                    showResult('Please enter a key first!', false);
+                    return;
+                }
+                
+                // This is where you would normally validate the key
+                // For demonstration, we'll always show as invalid
+                showResult('Invalid key format! Please try a different one.', false);
+            }
+            
+            // Update security indicator based on key strength
+            function updateSecurityIndicator() {
+                const key = keyInput.value;
+                let strength = 0;
+                
+                if (key.length > 0) {
+                    // Length contributes up to 40%
+                    strength += Math.min(key.length / 20, 0.4);
+                    
+                    // Character variety contributes up to 60%
+                    const hasUpper = /[A-Z]/.test(key);
+                    const hasLower = /[a-z]/.test(key);
+                    const hasNumber = /[0-9]/.test(key);
+                    const hasSpecial = /[^A-Za-z0-9]/.test(key);
+                    
+                    const varietyCount = [hasUpper, hasLower, hasNumber, hasSpecial].filter(Boolean).length;
+                    strength += (varietyCount / 4) * 0.6;
+                }
+                
+                // Convert to percentage
+                const percentage = Math.min(Math.floor(strength * 100), 100);
+                securityProgress.style.width = percentage + '%';
+                
+                // Update color based on strength
+                if (percentage < 30) {
+                    securityProgress.className = 'security-progress weak';
+                } else if (percentage < 70) {
+                    securityProgress.className = 'security-progress medium';
+                } else {
+                    securityProgress.className = 'security-progress strong';
+                }
+            }
+            
+            // Show result with animation
+            function showResult(message, isValid) {
+                resultDiv.textContent = message;
+                resultDiv.className = 'result show ' + (isValid ? 'valid' : 'invalid');
+                
+                // Hide result after 5 seconds
+                setTimeout(() => {
+                    resultDiv.classList.remove('show');
+                }, 5000);
+            }
+            
+            // Create background particles
+            function createParticles() {
+                for (let i = 0; i < 50; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    // Random properties
+                    const size = Math.random() * 10 + 2;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const delay = Math.random() * 15;
+                    const duration = Math.random() * 10 + 15;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}vw`;
+                    particle.style.top = `${posY}vh`;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            // Event listeners
+            validateBtn.addEventListener('click', validateKey);
+            
+            keyInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    validateKey();
+                }
+            });
+        });
+    </script>
+</body>
+  </html>
